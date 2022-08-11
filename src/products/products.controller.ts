@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guards';
 import { GetProductsFilterDto } from './dto/get-products-filter.dto';
 import { Product } from './product.entity';
@@ -12,5 +12,10 @@ export class ProductsController {
   @Get()
   getProducts(@Query() filterDto: GetProductsFilterDto): Promise<Product[]> {
     return this.productsService.getProducts(filterDto);
+  }
+
+  @Get(':id')
+  getProductById(@Param('id') id: string): Promise<Product> {
+    return this.productsService.getProductById(id);
   }
 }
