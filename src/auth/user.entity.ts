@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { InventoryEntity } from 'src/inventory/entities';
 import { IInventory } from 'src/inventory/interfaces';
 import {
@@ -17,9 +18,14 @@ export class UserEntity {
   email: string;
 
   @Column()
+  @Exclude()
   password: string;
 
-  @OneToOne(() => InventoryEntity)
+  @OneToOne(() => InventoryEntity, { cascade: true, eager: true })
   @JoinColumn({ referencedColumnName: 'id' })
   inventory: IInventory;
+
+  constructor(partial: Partial<UserEntity>) {
+    Object.assign(this, partial);
+  }
 }

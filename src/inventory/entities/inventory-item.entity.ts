@@ -1,3 +1,4 @@
+import { UserEntity } from 'src/auth/user.entity';
 import { IProduct } from 'src/products/interfaces';
 import { Product } from 'src/products/product.entity';
 import {
@@ -5,7 +6,6 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { IInventory } from '../interfaces';
@@ -19,7 +19,10 @@ export class InventoryItemEntity {
   @Column()
   quantity: number;
 
-  @OneToOne(() => Product)
+  @ManyToOne(() => UserEntity)
+  user: UserEntity;
+
+  @ManyToOne(() => Product)
   @JoinColumn()
   product: IProduct;
 

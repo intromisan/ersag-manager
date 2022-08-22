@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
 
-export class AddProductDto {
+export class CreateInventoryItemDto {
   @IsNotEmpty()
   @IsUUID()
   productId: string;

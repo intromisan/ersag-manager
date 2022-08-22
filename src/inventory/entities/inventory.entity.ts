@@ -1,4 +1,4 @@
-import { Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IInventoryItem } from '../interfaces';
 import { InventoryItemEntity } from './inventory-item.entity';
 
@@ -14,6 +14,7 @@ export class InventoryEntity {
       eager: true,
     },
   )
+  @JoinColumn()
   products: IInventoryItem[];
 
   totalInventory: number;
