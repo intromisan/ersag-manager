@@ -13,11 +13,15 @@ import { AuthCredentialsDto } from './dto/auth-creadentials.dto';
 import { User } from './user.entity';
 import { JwtPayload } from './interfaces';
 import { ConfigService } from '@nestjs/config';
+import { InventoryService } from 'src/inventory/inventory.service';
+import { Inventory } from 'src/inventory/entities';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Inventory)
+    private inventoryRepository: Repository<Inventory>,
     private jwtService: JwtService,
     private config: ConfigService,
   ) {}
@@ -29,25 +33,32 @@ export class AuthService {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const inventory = this.inventoryRepository.create({
+      products: [],
+    });
+
     const user = this.userRepository.create({
       email,
       password: hashedPassword,
     });
 
+    user.inventory = inventory;
+
     try {
+      await this.inventoryRepository.save(inventory);
       await this.userRepository.save(user);
     } catch (error) {
-      if (error.code === 23505) {
+      if (error.code === '23505') {
         throw new ConflictException('Email address already exists');
       } else {
-        throw new InternalServerErrorException();
+        throw new InternalServerErrorException(error.message);
       }
     }
   }
 
   async signIn(
     authCredentialsDto: AuthCredentialsDto,
-  ): Promise<{ accessToken: string }> {
+  ): Promise<{ access_token: string }> {
     const { email, password } = authCredentialsDto;
     const user = await this.userRepository.findOneBy({ email });
 
@@ -63,7 +74,7 @@ export class AuthService {
     const payload: JwtPayload = { email };
     const secret = this.config.get('JWT_SECRET');
     return {
-      accessToken: this.jwtService.sign(payload, {
+      access_token: this.jwtService.sign(payload, {
         expiresIn: '1h',
         secret: secret,
       }),

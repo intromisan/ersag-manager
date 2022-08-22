@@ -6,12 +6,13 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { User } from './user.entity';
 import { JwtStrategy } from './strategy';
+import { Inventory } from 'src/inventory/entities';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({}),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Inventory]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

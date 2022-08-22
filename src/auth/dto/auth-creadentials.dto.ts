@@ -1,4 +1,12 @@
-import { IsEmail, MinLength, IsString, IsNotEmpty } from 'class-validator';
+import {
+  IsEmail,
+  MinLength,
+  IsString,
+  IsNotEmpty,
+  ArrayContains,
+  IsObject,
+} from 'class-validator';
+import { IInventory } from 'src/inventory/interfaces';
 
 export class AuthCredentialsDto {
   @IsNotEmpty()
@@ -9,4 +17,7 @@ export class AuthCredentialsDto {
   @IsString()
   @MinLength(8)
   password: string;
+
+  @IsObject()
+  inventory: IInventory;
 }
