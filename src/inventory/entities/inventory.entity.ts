@@ -1,15 +1,19 @@
 import { Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IInventoryItem } from '../interfaces';
-import { InventoryItem } from './inventory-item.entity';
+import { InventoryItemEntity } from './inventory-item.entity';
 
-@Entity()
-export class Inventory {
+@Entity('inventories')
+export class InventoryEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @OneToMany(() => InventoryItem, (inventoryItem) => inventoryItem.inventory, {
-    eager: true,
-  })
+  @OneToMany(
+    () => InventoryItemEntity,
+    (inventoryItem) => inventoryItem.inventory,
+    {
+      eager: true,
+    },
+  )
   products: IInventoryItem[];
 
   totalInventory: number;

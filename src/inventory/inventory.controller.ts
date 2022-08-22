@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guards';
 import { AddProductDto } from './dto';
-import { Inventory } from './entities';
+import { InventoryEntity } from './entities';
 import { InventoryService } from './inventory.service';
 
 @Controller('inventory')
@@ -15,7 +15,7 @@ export class InventoryController {
   }
 
   @Get()
-  getInventory(): Promise<Inventory[]> {
+  getInventory(): Promise<InventoryEntity[]> {
     return this.inventoryService.getInventory();
   }
 }

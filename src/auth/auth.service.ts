@@ -10,18 +10,18 @@ import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { AuthCredentialsDto } from './dto/auth-creadentials.dto';
-import { User } from './user.entity';
+import { UserEntity } from './user.entity';
 import { JwtPayload } from './interfaces';
 import { ConfigService } from '@nestjs/config';
 import { InventoryService } from 'src/inventory/inventory.service';
-import { Inventory } from 'src/inventory/entities';
+import { InventoryEntity } from 'src/inventory/entities';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Inventory)
-    private inventoryRepository: Repository<Inventory>,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+    private inventoryService: InventoryService,
     private jwtService: JwtService,
     private config: ConfigService,
   ) {}
@@ -33,19 +33,12 @@ export class AuthService {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const inventory = this.inventoryRepository.create({
-      products: [],
-    });
-
     const user = this.userRepository.create({
       email,
       password: hashedPassword,
     });
 
-    user.inventory = inventory;
-
     try {
-      await this.inventoryRepository.save(inventory);
       await this.userRepository.save(user);
     } catch (error) {
       if (error.code === '23505') {
@@ -53,6 +46,20 @@ export class AuthService {
       } else {
         throw new InternalServerErrorException(error.message);
       }
+    }
+
+    // Create empty inventory
+    const inventory = await this.inventoryService.createInventory();
+
+    try {
+      this.userRepository
+        .createQueryBuilder()
+        .update(UserEntity)
+        .set({ inventory: inventory })
+        .where({ id: user.id })
+        .execute();
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -69,7 +76,7 @@ export class AuthService {
     }
   }
 
-  private async generateToken(user: User) {
+  private async generateToken(user: UserEntity) {
     const { email } = user;
     const payload: JwtPayload = { email };
     const secret = this.config.get('JWT_SECRET');

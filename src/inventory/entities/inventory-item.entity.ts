@@ -9,10 +9,10 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { IInventory } from '../interfaces';
-import { Inventory } from './inventory.entity';
+import { InventoryEntity } from './inventory.entity';
 
-@Entity()
-export class InventoryItem {
+@Entity('inventoryItems')
+export class InventoryItemEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: number;
 
@@ -23,6 +23,6 @@ export class InventoryItem {
   @JoinColumn()
   product: IProduct;
 
-  @ManyToOne(() => Inventory, (inventory) => inventory.products)
+  @ManyToOne(() => InventoryEntity, (inventory) => inventory.products)
   inventory: IInventory;
 }

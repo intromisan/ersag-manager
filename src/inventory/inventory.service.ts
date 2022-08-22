@@ -4,23 +4,23 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/auth/user.entity';
+import { UserEntity } from 'src/auth/user.entity';
 import { Product } from 'src/products/product.entity';
 import { Repository } from 'typeorm';
 import { AddProductDto } from './dto/add-product.dto';
-import { Inventory, InventoryItem } from './entities';
+import { InventoryEntity, InventoryItemEntity } from './entities';
 
 @Injectable()
 export class InventoryService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-    @InjectRepository(InventoryItem)
-    private inventoryItemRepository: Repository<InventoryItem>,
-    @InjectRepository(Inventory)
-    private inventoryRepository: Repository<Inventory>,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+    @InjectRepository(InventoryItemEntity)
+    private inventoryItemRepository: Repository<InventoryItemEntity>,
+    @InjectRepository(InventoryEntity)
+    private inventoryRepository: Repository<InventoryEntity>,
   ) {}
 
   async addProductToInventory(addProductDto: AddProductDto): Promise<any> {
@@ -48,7 +48,7 @@ export class InventoryService {
       if (exists) {
         await this.inventoryItemRepository
           .createQueryBuilder()
-          .update(InventoryItem)
+          .update(InventoryItemEntity)
           .set({ quantity: () => `quantity + ${quantity}` })
           .where('productId = :id', { id: product.id })
           .execute();
@@ -63,7 +63,7 @@ export class InventoryService {
 
         await this.inventoryRepository
           .createQueryBuilder()
-          .relation(Inventory, 'products')
+          .relation(InventoryEntity, 'products')
           .of(inventory)
           .add(inventoryItem);
       }
@@ -74,10 +74,15 @@ export class InventoryService {
     }
   }
 
-  async getInventory(): Promise<Inventory[]> {
+  async getInventory(): Promise<InventoryEntity[]> {
     return this.inventoryRepository
       .createQueryBuilder('inventory')
       .leftJoinAndSelect('inventory.products', 'inventoryItem')
       .getMany();
+  }
+
+  async createInventory(): Promise<InventoryEntity> {
+    const inventory = this.inventoryRepository.create();
+    return await this.inventoryRepository.save(inventory);
   }
 }

@@ -1,4 +1,4 @@
-import { Inventory } from 'src/inventory/entities';
+import { InventoryEntity } from 'src/inventory/entities';
 import { IInventory } from 'src/inventory/interfaces';
 import {
   Entity,
@@ -8,8 +8,8 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-@Entity()
-export class User {
+@Entity('users')
+export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -19,7 +19,7 @@ export class User {
   @Column()
   password: string;
 
-  @OneToOne(() => Inventory)
+  @OneToOne(() => InventoryEntity)
   @JoinColumn({ referencedColumnName: 'id' })
   inventory: IInventory;
 }
