@@ -2,16 +2,16 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorators';
 import { JwtGuard } from 'src/auth/guards';
 import { UserEntity } from 'src/auth/user.entity';
-import { CreateInventoryItemDto } from './dto';
+import { CreateInventoryItemDto, RemoveInventoryItemDto } from './dto';
 import { InventoryItemEntity } from './entities';
 import { InventoryService } from './inventory.service';
 
-@Controller('inventory')
+@Controller('inventoryItem')
 @UseGuards(JwtGuard)
 export class InventoryController {
   constructor(private inventoryService: InventoryService) {}
 
-  @Post('/inventoryItem')
+  @Post('/add')
   addInventoryItem(
     @Body() createInventoryItemDto: CreateInventoryItemDto,
     @GetUser() user: UserEntity,
@@ -19,8 +19,16 @@ export class InventoryController {
     this.inventoryService.addProductToInventory(createInventoryItemDto, user);
   }
 
+  @Post('/remove')
+  removeInventoryItem(
+    @Body() removeInventoryItemDto: RemoveInventoryItemDto,
+    @GetUser() user: UserEntity,
+  ) {
+    this.inventoryService.removeItemFromInventory(removeInventoryItemDto, user);
+  }
+
   @Get()
-  getInventory(@GetUser() user: UserEntity): Promise<any> {
+  getInventory(@GetUser() user: UserEntity): Promise<InventoryItemEntity[]> {
     return this.inventoryService.getInventory(user);
   }
 }

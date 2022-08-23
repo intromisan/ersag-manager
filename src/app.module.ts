@@ -7,7 +7,6 @@ import { InventoryModule } from './inventory/inventory.module';
 
 @Module({
   imports: [
-    AuthModule,
     ConfigModule.forRoot({
       envFilePath: '.development.env',
       isGlobal: true,
@@ -22,6 +21,7 @@ import { InventoryModule } from './inventory/inventory.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    AuthModule,
     ProductsModule,
     InventoryModule,
   ],

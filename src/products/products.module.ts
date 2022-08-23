@@ -9,5 +9,6 @@ import { ProductsService } from './products.service';
   imports: [AuthModule, TypeOrmModule.forFeature([ProductEntity])],
   controllers: [ProductsController],
   providers: [ProductsService],
+  exports: [ProductsService],
 })
 export class ProductsModule {}

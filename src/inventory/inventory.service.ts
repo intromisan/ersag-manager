@@ -6,17 +6,17 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/auth/user.entity';
 import { ProductEntity } from 'src/products/product.entity';
+import { ProductsService } from 'src/products/products.service';
 import { Repository } from 'typeorm';
-import { CreateInventoryItemDto } from './dto';
+import { CreateInventoryItemDto, RemoveInventoryItemDto } from './dto';
 import { InventoryItemEntity } from './entities';
 
 @Injectable()
 export class InventoryService {
   constructor(
-    @InjectRepository(ProductEntity)
-    private productRepository: Repository<ProductEntity>,
     @InjectRepository(InventoryItemEntity)
     private inventoryItemRepository: Repository<InventoryItemEntity>,
+    private readonly productsService: ProductsService,
   ) {}
 
   async addProductToInventory(
@@ -26,16 +26,15 @@ export class InventoryService {
     const { productId, quantity } = createInventoryItemDto;
 
     // Find product
-    const product = await this.productRepository.findOneBy({ id: productId });
-    if (!product)
-      throw new NotFoundException(`Product with ID: ${productId} not found`);
+    const product = await this.productsService.getProductById(productId);
 
-    const itemExists = await this.inventoryItemRepository.findOne({
+    // Find inventory item
+    const item = await this.inventoryItemRepository.findOne({
       where: { product, user },
     });
 
     try {
-      if (itemExists) {
+      if (item) {
         return await this.inventoryItemRepository
           .createQueryBuilder()
           .update(InventoryItemEntity)
@@ -51,10 +50,42 @@ export class InventoryService {
     }
   }
 
-  async getInventory(user: UserEntity): Promise<any> {
+  async removeItemFromInventory(
+    removeInventoryItemDto: RemoveInventoryItemDto,
+    user: UserEntity,
+  ) {
+    const { productId, quantity } = removeInventoryItemDto;
+    const { id: userId } = user;
+
+    const item = await this.inventoryItemRepository
+      .createQueryBuilder('item')
+      .leftJoinAndSelect('item.product', 'product')
+      .leftJoinAndSelect('item.user', 'user')
+      .where('user.id = :id', { id: userId })
+      .where('product.id = :id', { id: productId })
+      .getOne();
+
+    if (!item) throw new NotFoundException('Item not found in inventory');
+
+    if (item.quantity <= quantity) {
+      return await this.inventoryItemRepository.remove(item);
+    } else {
+      return await this.inventoryItemRepository
+        .createQueryBuilder()
+        .update(InventoryItemEntity)
+        .set({
+          quantity: () => `quantity - ${quantity}`,
+        })
+        .where('productId = :id', { id: productId })
+        .where('userId = :userId', { userId: userId })
+        .execute();
+    }
+  }
+
+  async getInventory(user: UserEntity): Promise<InventoryItemEntity[]> {
     const { id } = user;
 
-    const inventory = this.inventoryItemRepository
+    const inventory = await this.inventoryItemRepository
       .createQueryBuilder('item')
       .leftJoinAndSelect('item.product', 'product')
       .where('item.userId = :id', { id })
