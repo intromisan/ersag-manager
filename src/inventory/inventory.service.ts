@@ -5,20 +5,18 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/auth/user.entity';
-import { Product } from 'src/products/product.entity';
+import { ProductEntity } from 'src/products/product.entity';
 import { Repository } from 'typeorm';
 import { CreateInventoryItemDto } from './dto';
-import { InventoryEntity, InventoryItemEntity } from './entities';
+import { InventoryItemEntity } from './entities';
 
 @Injectable()
 export class InventoryService {
   constructor(
-    @InjectRepository(Product)
-    private productRepository: Repository<Product>,
+    @InjectRepository(ProductEntity)
+    private productRepository: Repository<ProductEntity>,
     @InjectRepository(InventoryItemEntity)
     private inventoryItemRepository: Repository<InventoryItemEntity>,
-    @InjectRepository(InventoryEntity)
-    private inventoryRepository: Repository<InventoryEntity>,
   ) {}
 
   async addProductToInventory(
@@ -47,65 +45,34 @@ export class InventoryService {
           .execute();
       } else {
         this.createInventoryItem(createInventoryItemDto, product, user);
-        // console.log('bla');
       }
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
-
-    // // Product exists as inventoryItem
-    // const exists = await this.inventoryItemRepository.findOne({
-    //   where: { product, inventory: userInventory },
-    // });
-
-    // try {
-    //   if (exists) {
-    //     await this.inventoryItemRepository
-    //       .createQueryBuilder()
-    //       .update(InventoryItemEntity)
-    //       .set({ quantity: () => `quantity + ${quantity}` })
-    //       .where('productId = :id', { id: product.id })
-    //       .execute();
-    //   } else {
-    //     const inventoryItem = this.inventoryItemRepository.create({
-    //       product: product,
-    //       quantity: quantity,
-    //       inventory: inventory,
-    //     });
-
-    //     await this.inventoryItemRepository.save(inventoryItem);
-
-    //     await this.inventoryRepository
-    //       .createQueryBuilder()
-    //       .relation(InventoryEntity, 'products')
-    //       .of(inventory)
-    //       .add(inventoryItem);
-    //   }
-
-    //   // await this.inventoryRepository.save(inventory);
-    // } catch (error) {
-    // }
   }
 
-  async getInventory(user: UserEntity): Promise<InventoryEntity> {
-    const { inventory: userInventory } = user;
-    return await this.inventoryRepository.findOne({
-      where: { id: userInventory.id },
-    });
+  async getInventory(user: UserEntity): Promise<any> {
+    const { id } = user;
+
+    const inventory = this.inventoryItemRepository
+      .createQueryBuilder('item')
+      .leftJoinAndSelect('item.product', 'product')
+      .where('item.userId = :id', { id })
+      .getMany();
+
+    return inventory;
   }
 
   private async createInventoryItem(
     createInventoryItemDto: CreateInventoryItemDto,
-    product: Product,
+    product: ProductEntity,
     user: UserEntity,
   ): Promise<InventoryItemEntity> {
     const { quantity } = createInventoryItemDto;
-    const { inventory: userInventory } = user;
 
     const newItem = this.inventoryItemRepository.create({
       product: product,
       quantity: quantity,
-      inventory: userInventory,
       user: user,
     });
 
@@ -114,10 +81,5 @@ export class InventoryService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
-  }
-
-  async createInventory(): Promise<InventoryEntity> {
-    const inventory = this.inventoryRepository.create();
-    return await this.inventoryRepository.save(inventory);
   }
 }

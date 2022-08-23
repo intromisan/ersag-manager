@@ -3,7 +3,7 @@ import { GetUser } from 'src/auth/decorators';
 import { JwtGuard } from 'src/auth/guards';
 import { UserEntity } from 'src/auth/user.entity';
 import { CreateInventoryItemDto } from './dto';
-import { InventoryEntity } from './entities';
+import { InventoryItemEntity } from './entities';
 import { InventoryService } from './inventory.service';
 
 @Controller('inventory')
@@ -20,7 +20,7 @@ export class InventoryController {
   }
 
   @Get()
-  getInventory(@GetUser() user: UserEntity): Promise<InventoryEntity> {
+  getInventory(@GetUser() user: UserEntity): Promise<any> {
     return this.inventoryService.getInventory(user);
   }
 }

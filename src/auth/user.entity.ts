@@ -1,12 +1,12 @@
 import { Exclude } from 'class-transformer';
-import { InventoryEntity } from 'src/inventory/entities';
-import { IInventory } from 'src/inventory/interfaces';
+import { InventoryItemEntity } from 'src/inventory/entities';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToOne,
   JoinColumn,
+  OneToMany,
+  JoinTable,
 } from 'typeorm';
 
 @Entity('users')
@@ -21,9 +21,9 @@ export class UserEntity {
   @Exclude()
   password: string;
 
-  @OneToOne(() => InventoryEntity, { cascade: true, eager: true })
-  @JoinColumn({ referencedColumnName: 'id' })
-  inventory: IInventory;
+  @OneToMany(() => InventoryItemEntity, (inventoryItem) => inventoryItem.user)
+  @JoinColumn({ name: 'inventory' })
+  inventory: InventoryItemEntity[];
 
   constructor(partial: Partial<UserEntity>) {
     Object.assign(this, partial);

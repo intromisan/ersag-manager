@@ -2,7 +2,6 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,15 +12,12 @@ import { AuthCredentialsDto } from './dto/auth-creadentials.dto';
 import { UserEntity } from './user.entity';
 import { JwtPayload } from './interfaces';
 import { ConfigService } from '@nestjs/config';
-import { InventoryService } from 'src/inventory/inventory.service';
-import { InventoryEntity } from 'src/inventory/entities';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-    private inventoryService: InventoryService,
     private jwtService: JwtService,
     private config: ConfigService,
   ) {}
@@ -46,20 +42,6 @@ export class AuthService {
       } else {
         throw new InternalServerErrorException(error.message);
       }
-    }
-
-    // Create empty inventory
-    const inventory = await this.inventoryService.createInventory();
-
-    try {
-      this.userRepository
-        .createQueryBuilder()
-        .update(UserEntity)
-        .set({ inventory: inventory })
-        .where({ id: user.id })
-        .execute();
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
     }
   }
 
