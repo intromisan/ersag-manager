@@ -75,4 +75,16 @@ export class ProductsService {
       throw new InternalServerErrorException();
     }
   }
+
+  async deleteProduct(id: string): Promise<void> {
+    try {
+      await this.productRepository.delete(id);
+    } catch (error) {
+      if (error.code === '22P02') {
+        throw new NotFoundException();
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
+  }
 }

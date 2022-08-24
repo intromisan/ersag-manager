@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -43,5 +44,10 @@ export class ProductsController {
     @Body() editProductDto: EditProductDto,
   ): Promise<void> {
     return this.productsService.changeProduct(id, editProductDto);
+  }
+
+  @Delete(':id')
+  deleteProduct(@Param('id') id: string): Promise<void> {
+    return this.productsService.deleteProduct(id);
   }
 }
