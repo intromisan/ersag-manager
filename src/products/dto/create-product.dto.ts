@@ -1,6 +1,13 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
+import { VolumeUnit } from '../interfaces';
 
-export class ProductDto {
+export class CreateProductDto {
   @IsNotEmpty()
   @IsString()
   name: string;
@@ -10,15 +17,19 @@ export class ProductDto {
   code: string;
 
   @IsNotEmpty()
-  @IsString()
-  volume: string;
+  @IsNumber()
+  volume: number;
+
+  @IsNotEmpty()
+  @IsEnum(VolumeUnit)
+  volumeUnit: VolumeUnit;
 
   @IsNotEmpty()
   @IsNumber()
   price: number;
 
   @IsBoolean()
-  withDevice: boolean;
+  withDevice: boolean = false;
 
   @IsString()
   image: string;

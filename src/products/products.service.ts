@@ -1,6 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateProductDto } from './dto/create-product.dto';
 import { GetProductsFilterDto } from './dto/get-products-filter.dto';
 import { ProductEntity } from './product.entity';
 
@@ -35,5 +41,21 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID ${id} not found`);
 
     return product;
+  }
+
+  async createProduct(createProductDto: CreateProductDto): Promise<void> {
+    const product = this.productRepository.create({ ...createProductDto });
+
+    try {
+      await this.productRepository.save(product);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException(
+          `Product with code: ${createProductDto.code} already exists`,
+        );
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
   }
 }
