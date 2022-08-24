@@ -3,12 +3,14 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { JwtGuard } from 'src/auth/guards';
 import { CreateProductDto } from './dto/create-product.dto';
+import { EditProductDto } from './dto/edit-product.dto';
 import { GetProductsFilterDto } from './dto/get-products-filter.dto';
 import { ProductEntity } from './product.entity';
 import { ProductsService } from './products.service';
@@ -33,5 +35,13 @@ export class ProductsController {
   @Post()
   createProduct(@Body() createProductDto: CreateProductDto): Promise<void> {
     return this.productsService.createProduct(createProductDto);
+  }
+
+  @Patch(':id')
+  updateProduct(
+    @Param('id') id: string,
+    @Body() editProductDto: EditProductDto,
+  ): Promise<void> {
+    return this.productsService.changeProduct(id, editProductDto);
   }
 }
