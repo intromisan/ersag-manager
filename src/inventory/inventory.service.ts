@@ -65,8 +65,6 @@ export class InventoryService {
       .where('product.id = :id', { id: productId })
       .getOne();
 
-    console.log(item);
-
     if (!item) throw new NotFoundException('Item not found in inventory');
 
     if (item.quantity <= quantity) {
@@ -94,6 +92,19 @@ export class InventoryService {
       .getMany();
 
     return inventory;
+  }
+
+  async getInventoryTotalValue(user: UserEntity): Promise<any> {
+    const { id: userId } = user;
+    const totalValue = await this.inventoryItemRepository
+      .createQueryBuilder('item')
+      .leftJoinAndSelect('item.product', 'product')
+      .leftJoinAndSelect('item.user', 'user')
+      .where('user.id = :id', { id: userId })
+      .select('SUM(product.price)', 'totalValue')
+      .getRawOne();
+
+    console.log(totalValue);
   }
 
   private async createInventoryItem(
