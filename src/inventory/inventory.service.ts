@@ -65,6 +65,8 @@ export class InventoryService {
       .where('product.id = :id', { id: productId })
       .getOne();
 
+    console.log(item);
+
     if (!item) throw new NotFoundException('Item not found in inventory');
 
     if (item.quantity <= quantity) {
@@ -73,11 +75,11 @@ export class InventoryService {
       return await this.inventoryItemRepository
         .createQueryBuilder()
         .update(InventoryItemEntity)
+        .where('userId = :userId', { userId: userId })
+        .where('productId = :id', { id: productId })
         .set({
           quantity: () => `quantity - ${quantity}`,
         })
-        .where('productId = :id', { id: productId })
-        .where('userId = :userId', { userId: userId })
         .execute();
     }
   }
