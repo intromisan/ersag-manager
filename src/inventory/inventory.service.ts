@@ -94,7 +94,9 @@ export class InventoryService {
     return inventory;
   }
 
-  async getInventoryTotalValue(user: UserEntity): Promise<any> {
+  async getInventoryTotalValue(
+    user: UserEntity,
+  ): Promise<{ totalValue: number }> {
     const { id: userId } = user;
     const totalValue = await this.inventoryItemRepository
       .createQueryBuilder('item')
@@ -104,7 +106,7 @@ export class InventoryService {
       .select('SUM(product.price)', 'totalValue')
       .getRawOne();
 
-    console.log(totalValue);
+    return totalValue;
   }
 
   private async createInventoryItem(

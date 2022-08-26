@@ -38,4 +38,8 @@ export class UserService {
       }
     }
   }
+
+  getUserBalance(user: UserEntity): { userBalance: number } {
+    return { userBalance: user.balance };
+  }
 }
