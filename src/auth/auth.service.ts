@@ -22,7 +22,7 @@ export class AuthService {
     private config: ConfigService,
   ) {}
 
-  async createUser(authCredentialsDto: AuthCredentialsDto): Promise<void> {
+  async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
     const { email, password } = authCredentialsDto;
 
     // Hash

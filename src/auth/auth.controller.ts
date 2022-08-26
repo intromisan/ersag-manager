@@ -15,6 +15,6 @@ export class AuthController {
 
   @Post('signup')
   signUp(@Body() authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    return this.authService.createUser(authCredentialsDto);
+    return this.authService.signUp(authCredentialsDto);
   }
 }
