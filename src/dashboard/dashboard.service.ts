@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { retry } from 'rxjs';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { UserEntity } from 'src/user/entities';
 import { IDashboardInformation } from './interface';

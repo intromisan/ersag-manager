@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmpty,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 
 export class RemoveInventoryItemDto {
   @IsNotEmpty()
@@ -7,4 +13,13 @@ export class RemoveInventoryItemDto {
 
   @IsNumber()
   quantity: number = 1;
+
+  @IsBoolean()
+  isGift: boolean = false;
+
+  @IsBoolean()
+  isDelete: boolean = false;
+
+  @IsNumber()
+  price: number;
 }

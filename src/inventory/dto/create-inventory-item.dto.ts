@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
 
 export class CreateInventoryItemDto {
   @IsNotEmpty()
@@ -7,4 +7,7 @@ export class CreateInventoryItemDto {
 
   @IsNumber()
   quantity: number = 1;
+
+  @IsBoolean()
+  isGift: boolean = false;
 }

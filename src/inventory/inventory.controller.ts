@@ -15,16 +15,22 @@ export class InventoryController {
   addInventoryItem(
     @Body() createInventoryItemDto: CreateInventoryItemDto,
     @GetUser() user: UserEntity,
-  ) {
-    this.inventoryService.addProductToInventory(createInventoryItemDto, user);
+  ): Promise<void> {
+    return this.inventoryService.addProductToInventory(
+      createInventoryItemDto,
+      user,
+    );
   }
 
   @Post('/remove')
   removeInventoryItem(
     @Body() removeInventoryItemDto: RemoveInventoryItemDto,
     @GetUser() user: UserEntity,
-  ) {
-    this.inventoryService.removeItemFromInventory(removeInventoryItemDto, user);
+  ): Promise<void> {
+    return this.inventoryService.removeItemFromInventory(
+      removeInventoryItemDto,
+      user,
+    );
   }
 
   @Get()
