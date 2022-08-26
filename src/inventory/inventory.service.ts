@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/auth/user.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { ProductEntity } from 'src/products/product.entity';
 import { ProductsService } from 'src/products/products.service';
 import { Repository } from 'typeorm';

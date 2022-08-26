@@ -1,4 +1,4 @@
-import { UserEntity } from 'src/auth/user.entity';
+import { UserEntity } from 'src/user/entities';
 import { IProduct } from 'src/products/interfaces';
 import { ProductEntity } from 'src/products/product.entity';
 import {

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from 'src/auth/user.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { ProductEntity } from 'src/products/product.entity';
 import { ProductsModule } from 'src/products/products.module';
 import { InventoryItemEntity } from './entities';
