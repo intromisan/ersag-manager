@@ -25,7 +25,7 @@ export class InventoryService {
     createInventoryItemDto: CreateInventoryItemDto,
     user: UserEntity,
   ): Promise<void> {
-    const { productId, quantity, isGift: isPresent } = createInventoryItemDto;
+    const { productId, quantity, isGift } = createInventoryItemDto;
 
     // Find product
     const product = await this.productsService.getProductById(productId);
@@ -50,7 +50,7 @@ export class InventoryService {
       }
 
       // If not a present, deduct from balance
-      if (!isPresent)
+      if (!isGift)
         await this.userService.deductFromUserBalance(user, product.price);
     } catch (error) {
       throw new InternalServerErrorException(error.message);
