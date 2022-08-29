@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CalculationToBalanceDto, CreateUserDto } from './dto';
+import { ChangeDiscountDto, CreateUserDto } from './dto';
 import { UserEntity } from './entities';
 
 @Injectable()
@@ -87,6 +87,17 @@ export class UserService {
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  async changeUserDiscount(
+    user: UserEntity,
+    changeDiscountDto: ChangeDiscountDto,
+  ): Promise<void> {
+    const { discount } = changeDiscountDto;
+    await this.userRepository.update(
+      { id: user.id },
+      { discount: discount / 100 },
+    );
   }
 
   private getDiscountedPrice(discount: number, productPrice: number): number {
